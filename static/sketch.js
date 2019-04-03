@@ -7,6 +7,13 @@ let circleX, circleY;
 var grabbed = false;
 let returnRate = 0.1;
 
+var socket = io.connect('http://localhost:5000');
+
+// socket.on( 'connect', function() {
+//         socket.emit( cmd', {
+//           data: 'User Connected'
+//         } );
+
 function setup() {
   createCanvas(window.innerWidth, window.innerHeight);
   centerX = window.innerWidth/2;
@@ -31,6 +38,7 @@ function draw() {
   if (grabbed) {
     circleX = mouseX;
     circleY = mouseY;
+    socket.emit('cmd', { x : circleX, y : circleY });
   }
   // drift the mouse back towards the center
   else {

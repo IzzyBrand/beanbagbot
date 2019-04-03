@@ -10,15 +10,11 @@ def main():
     return render_template('index.html')
 
 
-def received(msg):
-    print(msg)
-
-
-@socketio.on('emit')
+@socketio.on('cmd')
 def request_move(message):
-    print('hi')
-    socketio.emit('hi', {}, callback=received)
+    print('received: ' + str(message))
+    # socketio.emit('hi', {}, callback=received)
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, debug=True)

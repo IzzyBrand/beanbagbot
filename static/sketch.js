@@ -5,9 +5,15 @@ let centerX, centerY;
 let circleSize;
 let circleX, circleY;
 var grabbed = false;
+var active = false;
 let returnRate = 0.1;
 
 var socket = io.connect('http://localhost:5000');
+
+socket.on('deactivate', function(msg) {
+        console.log(msg);
+        active=false;
+});
 
 
 function setup() {
@@ -25,13 +31,10 @@ function draw() {
   background(0);
   ellipseMode(CENTER);
 
-  // draw the underlying ellipse
-  fill(0);
-  stroke(255);
-  ellipse(centerX, centerY, circleSize, circleSize);
+
 
   // update the mouse position
-  if (grabbed) {
+  if (active && grabbed) {
     circleX = mouseX;
     circleY = mouseY;
   }
@@ -41,10 +44,28 @@ function draw() {
     circleY = (1 - returnRate) * circleY + returnRate * centerY;
   }
 
-  socket.emit('cmd', { x : Math.round(circleX-centerX), y : Math.round(circleY-centerY) });
+  if (active) {
+    socket.emit('cmd', { x : Math.round(circleX-centerX), y : Math.round(circleY-centerY) });
 
-  // draw the mouse position
-  fill(255);
+    // draw the underlying ellipse
+    fill(0);
+    stroke(255);
+    strokeWeight(2);
+    ellipse(centerX, centerY, circleSize, circleSize);
+
+    // set the fill for the actual circle
+    fill(255);
+  }
+  else {
+    fill(255);
+    noStroke();
+    textSize(circleSize/6);
+    textAlign(CENTER, CENTER);
+    text('tap to take control', centerX, centerY*1.5);
+
+    // set the fill for the actual circle
+    fill(150);
+  }
   noStroke();
   ellipse(circleX, circleY, circleSize, circleSize);
 }
@@ -60,4 +81,10 @@ function mousePressed() {
 // handle the mouse up event
 function mouseReleased() {
   grabbed = false;
+}
+
+function mouseClicked() {
+  if (!active) {
+    socket.emit('activate', {}, function(data) {active = true;});
+  }
 }

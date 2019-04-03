@@ -14,9 +14,11 @@ function setup() {
   circleX = centerX;
   circleY = centerY;
   circleSize = Math.min(window.innerWidth, window.innerHeight)/6;
+  // ws = new WebSocket("ws://localhost:5000/cmd");
 }
 
 function draw() {
+  // ws.send('hi');
   background(0);
   ellipseMode(CENTER);
 

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script language="javascript" type="text/javascript" src="/static/jquery.min.js"></script>
+  <script language="javascript" type="text/javascript" src="/static/p5.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('connect', function() {
+            socket.emit('my event', {data: 'I\'m connected!'});
+        });
+</script>
+
+  <script language="javascript" type="text/javascript" src="/static/sketch.js"></script>
+
+  <style>
+      body {
+        margin:0;
+        overflow: hidden;
+      }
+  </style>
+</head>
+
+<body>
+</body>
+</html>

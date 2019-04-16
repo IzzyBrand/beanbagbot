@@ -1,0 +1,6 @@
+package beanbagbot;
+
+struct command {
+	double forward;
+	double turn;
+}

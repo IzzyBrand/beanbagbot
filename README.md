@@ -20,3 +20,10 @@ The goal of the BeanBagBot is to bring this unusual social lubricant into the ou
 Aside from the impact of the completed vehicle, I think the construction of the BeanBagBot will be an opportunity to collect a small group of robotics and design enthusiasts. A number of underclassmen have expressed interest in the project, and I am excited to work with them. I can pass the robot off to them when I graduate, and hopefully the experience they get in bringing the BeanBagBot to life will give them more confidence to pursue projects on their own in the future.
 
 _This project was funded jointly by the Brown Design Workshop and Brown Humanity Centered Robotics Initiative_
+
+## Requirements
+
+ * [Lightweight Communications Martialling (LCM)](https://lcm-proj.github.io/)
+ * Flask
+ * flask_socketio
+ * pigpio

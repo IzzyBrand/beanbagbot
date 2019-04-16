@@ -5,7 +5,7 @@ import json
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-cmd = {'x': 0, 'y': 0}
+cmd = {'forward': 0, 'turn': 0}
 
 @app.route('/')
 def main():

@@ -3,6 +3,7 @@ sqrt = n => Math.sqrt(n);
 
 let centerX, centerY;
 let minDim;
+let maxTravel;
 let circleSize;
 let circleX, circleY;
 var grabbed = false;
@@ -26,6 +27,7 @@ function setup() {
   circleY = centerY;
   circleSize = minDim/6;
   fontSize = minDim/25;
+  maxTravel = minDim/2-circleSize/2;
 }
 
 function draw() {
@@ -38,7 +40,7 @@ function draw() {
     var d = sqrt(sq(mouseX-centerX) + sq(mouseY-centerY));
     var dx = (mouseX-centerX)/d;
     var dy = (mouseY-centerY)/d;
-    d = Math.min(minDim/2-circleSize/2, d);
+    d = Math.min(maxTravel, d);
 
     circleX = dx*d+centerX;
     circleY = dy*d+centerY;
@@ -50,7 +52,8 @@ function draw() {
   }
 
   if (active) {
-    socket.emit('cmd', { x : Math.round(circleX-centerX), y : Math.round(circleY-centerY) });
+    socket.emit('cmd', { turn : (circleX-centerX)/maxTravel,
+                      forward : -(circleY-centerY)/maxTravel });
     drawActive();
   }
   else {

@@ -10,19 +10,20 @@ var grabbed = false;
 var active = false;
 let returnRate = 0.1;
 
-var socket = io.connect('http://beanbagbot.local:5000');
+var socket = io.connect('http://beanbagbot.local:5000'); // for when deployed on beanbagbot
+if (!socket.connected) { socket = io.connect('http://localhost:5000'); } // for testing locally
+
 
 socket.on('deactivate', function(msg) {
         console.log(msg);
         active=false;
 });
 
-
-function setup() {
-  createCanvas(window.innerWidth, window.innerHeight);
-  minDim = Math.min(window.innerWidth, window.innerHeight);
-  centerX = window.innerWidth/2;
-  centerY = window.innerHeight/2;
+// config all the variables based on the window size
+function sizeDependentSetup(w, h) {
+  minDim = Math.min(w, h);
+  centerX = w/2;
+  centerY = h/2;
   circleX = centerX;
   circleY = centerY;
   circleSize = minDim/6;
@@ -30,6 +31,19 @@ function setup() {
   maxTravel = minDim/2-circleSize/2;
 }
 
+// gets called when the window is resized
+function windowResized() {
+  sizeDependentSetup(windowWidth, windowHeight);
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+// called once on startup
+function setup() {
+  createCanvas(window.innerWidth, window.innerHeight);
+  sizeDependentSetup(window.innerWidth, window.innerHeight);
+}
+
+// called at 60hz
 function draw() {
   background(0);
   ellipseMode(CENTER);
@@ -44,21 +58,19 @@ function draw() {
 
     circleX = dx*d+centerX;
     circleY = dy*d+centerY;
+
+    // only send commands when the user is moving the stick
+    socket.emit('cmd', { turn : (circleX-centerX)/maxTravel,
+                      forward : -(circleY-centerY)/maxTravel });
   }
-  // drift the mouse back towards the center
+  // drift the circle back towards the center
   else {
     circleX = (1 - returnRate) * circleX + returnRate * centerX;
     circleY = (1 - returnRate) * circleY + returnRate * centerY;
   }
 
-  if (active) {
-    socket.emit('cmd', { turn : (circleX-centerX)/maxTravel,
-                      forward : -(circleY-centerY)/maxTravel });
-    drawActive();
-  }
-  else {
-    drawInactive();
-  }
+  if (active) { drawActive(); }
+  else { drawInactive(); }
 }
 
 function drawActive() {
@@ -90,8 +102,6 @@ function drawActive() {
       ellipse(centerX+c1x, centerY+c1y, r*2, r*2);
       ellipse(centerX+c2x, centerY+c2y, r*2, r*2);
     }
-
-
 }
 
 function drawInactive() {

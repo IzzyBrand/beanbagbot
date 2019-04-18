@@ -23,12 +23,13 @@ class Motors:
 							 [1, -1]])
 
 	def set(self, forward, turn):
-		# calculate the pwm for each motor
-		cmd = np.array([forward, turn], dtype=float)
+		# scale the commands by the coefficients specified in params
+		cmd = np.array([forward * p.forward_coeff, turn * p.turn_coeff], dtype=float)
+		# apply the mixing matrix to go from command to motor speeds
 		motor_speeds = (self.mix @ cmd) * p.motor_dirs
-		motor_pwms = (motor_speeds * p.pwm_range + p.pwm_midpoint).astype(int)
+		# add the pwm midpoint and restrict to the pwm range
+		motor_pwms = np.clip(motor_speeds + p.pwm_mid, p.pwm_min, p.pwm_max).astype(int)
 
-		print(motor_pwms)
 		# set the motors accordingly
 		for pin, pwm in zip(p.motor_pins, motor_pwms):
 			self.pi.set_servo_pulsewidth(pin, pwm)

@@ -20,3 +20,6 @@ adc_scale = 3.
 # battery voltage thresholds
 batt_warn_voltage = 11.5
 batt_min_voltage = 11.2
+
+# the server stops handling command requests if it hasn't received new control
+server_command_timeout = 1

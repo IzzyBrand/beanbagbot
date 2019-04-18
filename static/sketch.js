@@ -10,7 +10,7 @@ var grabbed = false;
 var active = false;
 let returnRate = 0.1;
 
-var socket = io.connect('http://localhost:5000');
+var socket = io.connect('http://beanbagbot.local:5000');
 
 socket.on('deactivate', function(msg) {
         console.log(msg);

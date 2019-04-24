@@ -10,7 +10,9 @@ var grabbed = false;
 var active = false;
 let returnRate = 0.1;
 
-var socket = io.connect('http://beanbagbot.local:5000'); // for when deployed on beanbagbot
+var socket = io.connect('http://10.0.0.1.local:5000'); // for when deployed on beanbagbot
+if (!socket.connected) { socket = io.connect('http://beanbagbot:5000'); } // for when deployed on beanbagbot
+if (!socket.connected) { socket = io.connect('http://beanbagbot.local:5000'); } // for when deployed on beanbagbot
 if (!socket.connected) { socket = io.connect('http://localhost:5000'); } // for testing locally
 
 
@@ -129,11 +131,14 @@ function mousePressed() {
 // handle the mouse up event
 function mouseReleased() {
   grabbed = false;
-}
-
-// handle mouse clicking to grab control
-function mouseClicked() {
   if (!active) {
     socket.emit('activate', {}, function(data) {active = true;});
   }
 }
+
+// handle mouse clicking to grab control
+// function mouseClicked() {
+//   if (!active) {
+//     socket.emit('activate', {}, function(data) {active = true;});
+//   }
+// }

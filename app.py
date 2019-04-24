@@ -12,6 +12,10 @@ cmd = {'forward': 0, 'turn': 0, 'time': 0}
 def main():
     return render_template('index.html')
 
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
+
 @socketio.on('cmd')
 def user_input(msg):
 	cmd.update(msg)

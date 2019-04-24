@@ -47,21 +47,21 @@ function setupMotorSliders() {
   textAlign(LEFT, CENTER);
 
   motor1Slider = createSlider(1000, 2000, servoMidpoint, 1);
-  motor1Slider.position(leftBorder, verticalSpacing * 1);
+  motor1Slider.position(leftBorder + servoValWidth, verticalSpacing * 1);
   motor1Slider.style('width', usableWidth - servoValWidth + 'px');
-  motor1Text = text(servoMidpoint, usableWidth - servoValWidth + leftBorder + 5, verticalSpacing * 1 + sliderThickness);
+  motor1Text = text(servoMidpoint, leftBorder + 5, verticalSpacing * 1 + sliderThickness);
   
   motor2Slider = createSlider(1000, 2000, servoMidpoint, 1);
-  motor2Slider.position(leftBorder, verticalSpacing * 2);
+  motor2Slider.position(leftBorder + servoValWidth, verticalSpacing * 2);
   motor2Slider.style('width', usableWidth - servoValWidth + 'px');
   motor2Text = text(servoMidpoint, usableWidth - servoValWidth + leftBorder + 5, verticalSpacing * 2 + sliderThickness);
   
   motor3Slider = createSlider(1000, 2000, servoMidpoint, 1);
-  motor3Slider.position(leftBorder, verticalSpacing * 3);
+  motor3Slider.position(leftBorder + servoValWidth, verticalSpacing * 3);
   motor3Slider.style('width', usableWidth - servoValWidth + 'px');
   
   motor4Slider = createSlider(1000, 2000, servoMidpoint, 1);
-  motor4Slider.position(leftBorder, verticalSpacing * 4);
+  motor4Slider.position(leftBorder + servoValWidth, verticalSpacing * 4);
   motor4Slider.style('width', usableWidth - servoValWidth + 'px');
 }
 
@@ -106,13 +106,20 @@ function handleMotorValues() {
   motor3val = motor3Slider.value();
   motor4val = motor4Slider.value();
   
+  textSize(20);
+  fill(200, 200, 200);
+  motor1Label = text("1:", leftBorder - 15, verticalSpacing * 1 + sliderThickness);
+  motor2Label = text("2:", leftBorder - 15, verticalSpacing * 2 + sliderThickness);
+  motor3Label = text("3:", leftBorder - 15, verticalSpacing * 3 + sliderThickness);
+  motor4Label = text("4:", leftBorder - 15, verticalSpacing * 4 + sliderThickness);
+  
   textSize(30);
   fill(255, 255, 255);
 
-  motor1Text = text(motor1val, usableWidth - servoValWidth + leftBorder + 5, verticalSpacing * 1 + sliderThickness);
-  motor2Text = text(motor2val, usableWidth - servoValWidth + leftBorder + 5, verticalSpacing * 2 + sliderThickness);
-  motor3Text = text(motor3val, usableWidth - servoValWidth + leftBorder + 5, verticalSpacing * 3 + sliderThickness);
-  motor4Text = text(motor4val, usableWidth - servoValWidth + leftBorder + 5, verticalSpacing * 4 + sliderThickness);
+  motor1Text = text(motor1val, leftBorder + 5, verticalSpacing * 1 + sliderThickness);
+  motor2Text = text(motor2val, leftBorder + 5, verticalSpacing * 2 + sliderThickness);
+  motor3Text = text(motor3val, leftBorder + 5, verticalSpacing * 3 + sliderThickness);
+  motor4Text = text(motor4val, leftBorder + 5, verticalSpacing * 4 + sliderThickness);
 
   //TODO: Deadband? This is kinda spammy to be sending at 60Hz
   if (motor1val !== servoMidpoint || motor2val !== servoMidpoint || motor3val !== servoMidpoint || motor4val !== servoMidpoint ) {
@@ -122,6 +129,7 @@ function handleMotorValues() {
       motor3 : motor3val,
       motor4 : motor4val,
     };
+    console.log("Sending: " + JSON.stringify(data));
     socket.emit('raw_pwm', data);
   }
 }

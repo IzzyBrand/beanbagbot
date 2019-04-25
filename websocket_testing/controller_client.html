@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>WebSocket demo</title>
+    </head>
+    <body>
+        <script>
+            function guid() {
+              function s4() {
+                return Math.floor((1 + Math.random()) * 0x10000)
+                  .toString(16)
+                  .substring(1);
+              }
+              return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                s4() + '-' + s4() + s4() + s4();
+            }
+
+            var myID = guid();
+            var ws = new WebSocket("ws://localhost:5050/");
+            
+            ws.onopen = function(event) {
+                data = {id: myID};
+                ws.send(JSON.stringify(data));
+            }
+            
+            ws.onmessage = function (event) {
+                msg = JSON.parse(event.data);
+                if ('id' in msg) {
+                  console.log(myID == msg['id']);
+                }
+            }
+        </script>
+    </body>
+</html>

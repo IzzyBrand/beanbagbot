@@ -3,7 +3,7 @@ import numpy as np
 import params as p
 import os
 import time
-import subprocess
+import sys
 
 class Motors:
 	def __init__(self):
@@ -30,6 +30,8 @@ class Motors:
 		# add the pwm midpoint and restrict to the pwm range
 		motor_pwms = np.clip(motor_speeds + p.pwm_mid, p.pwm_min, p.pwm_max).astype(int)
 
+		print(motor_pwms)
+
 		# set the motors accordingly
 		for pin, pwm in zip(p.motor_pins, motor_pwms):
 			self.pi.set_servo_pulsewidth(pin, pwm)
@@ -39,3 +41,14 @@ class Motors:
 			self.pi.set_servo_pulsewidth(pin, p.pwm_midpoint)
 
 		self.pi.stop()
+
+
+if __name__ == '__main__':
+	m = Motors()
+	m.set(0,0)
+
+	if len(sys.argv) > 1 and sys.argv[1] == 'test':
+		for pin in p.motor_pins:
+			m.pi.set_servo_pulsewidth(pin, 1600)
+			time.sleep(2)
+			m.pi.set_servo_pulsewidth(pin, 1500)

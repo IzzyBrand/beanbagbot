@@ -1,8 +1,8 @@
 import numpy as np
 
 # [front_left, back_left, front_right, back_right]
-motor_pins = np.array([9, 10, 11, 12])
-motor_dirs = np.array([1, 1, 1, 1])
+motor_pins = np.array([22, 23, 27, 17])
+motor_dirs = np.array([1, -1, -1, 1])
 
 # convert joystick commands to PWM
 pwm_mid = 1500

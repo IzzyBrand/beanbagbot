@@ -6,8 +6,12 @@
     <body>
         <script>
             var ws = new WebSocket("ws://localhost:5050/");
+            ws.onopen = function(event) {
+                ws.send("Badabing Badaboom");
+            }
+            
             ws.onmessage = function (event) {
-                console.log(JSON.parse(event.data));
+                console.log(event.data);
             }
         </script>
     </body>

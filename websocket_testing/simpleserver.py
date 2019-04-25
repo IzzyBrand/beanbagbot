@@ -2,11 +2,10 @@ from SimpleWebSocketServer import SimpleWebSocketServer, WebSocket
 
 clients = []
 
-class SimpleEcho(WebSocket):
+class BroadcastOnConnect(WebSocket):
 
     def handleMessage(self):
-        # echo message back to client
-        self.sendMessage(self.data)
+        print('Received: {}'.format(self.data))
 
     def handleConnected(self):
         print(self.address, 'connected')
@@ -19,8 +18,8 @@ class SimpleEcho(WebSocket):
 
     def broadcast(self, message):
         for client in clients:
-            print('Broadcasting to: ' + str(client.address))
+            print('Broadcasting to: {}'.format(client.address))
             client.sendMessage(message)
 
-server = SimpleWebSocketServer('', 5050, SimpleEcho)
+server = SimpleWebSocketServer('0.0.0.0', 5050, BroadcastOnConnect)
 server.serveforever()

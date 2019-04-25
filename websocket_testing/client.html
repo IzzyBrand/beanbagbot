@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>WebSocket demo</title>
+    </head>
+    <body>
+        <script>
+            var ws = new WebSocket("ws://localhost:5050/");
+            ws.onmessage = function (event) {
+                console.log(JSON.parse(event.data));
+            }
+        </script>
+    </body>
+</html>

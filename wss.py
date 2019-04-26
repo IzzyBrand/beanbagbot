@@ -22,6 +22,10 @@ class ControllerServer(WebSocket):
 
             elif 'forward' in parsed_data:
                 print('Received {}\t{}'.format(parsed_data['forward'], parsed_data['turn']))
+                # the motors should be the first client to connect
+                # TODO: make sure this is the case
+                if len(clients) > 0:
+                    clients[0].sendMessage(msg)
 
             else:
                 pass

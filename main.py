@@ -1,34 +1,25 @@
-import requests
 import time
 import numpy as np
 import params as p
+import asyncio
+import websockets
+import json
 
-from motors import Motors
+# from motors import Motors
+
+async def run():
+    # m = Motors()
+    # m.set(0,0)
+
+    socket_addr = 'ws://localhost:{}'.format(p.websocket_port)
+    async with websockets.connect(socket_addr) as websocket:
+        data = {"id": "motors"}
+        await websocket.send(json.dumps(data))
+        while True:
+            data = await websocket.recv()
+            print(data)
+            asyncio.sleep(0.05)
 
 
 if __name__ == '__main__':
-    m = Motors()
-    while True:
-        try:
-            response = requests.get("http://localhost:5000/get_cmd")
-            if response.ok:
-                data = response.json()
-                print(data)
-
-                if data['elapsed'] > 1:
-                    m.set(0,0)
-                else:
-                    m.set(data['forward'], data['turn'])
-
-            else:
-                print('Status Code {}'.format(response.status_code))
-                m.set(0, 0)
-
-        except requests.ConnectionError:
-            print('Request failed.')
-            m.set(0, 0)
-
-
-        time.sleep(0.05)
-
-    m.stop()
+    asyncio.get_event_loop().run_until_complete(run())

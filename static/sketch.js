@@ -1,5 +1,16 @@
 sq = n => Math.pow(n, 2);
 sqrt = n => Math.sqrt(n);
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
+
+let myID = guid();
 
 let centerX, centerY;
 let minDim;
@@ -10,16 +21,24 @@ var grabbed = false;
 var active = false;
 let returnRate = 0.1;
 
-var socket = io.connect('http://10.0.0.1.local:5000'); // for when deployed on beanbagbot
-if (!socket.connected) { socket = io.connect('http://beanbagbot:5000'); } // for when deployed on beanbagbot
-if (!socket.connected) { socket = io.connect('http://beanbagbot.local:5000'); } // for when deployed on beanbagbot
-if (!socket.connected) { socket = io.connect('http://localhost:5000'); } // for testing locally
+var ws = new WebSocket("ws://localhost:5050/");
+if (ws.readyState != ws.OPEN) { ws = new WebSocket("ws://beanbagbot.local:5050/"); }
+if (ws.readyState != ws.OPEN) { ws = new WebSocket("ws://10.0.0.1:5050/"); }
+if (ws.readState != ws.OPEN) { ws = new WebSocket("ws://beanbagbot:5050/"); }
 
+// Send myID to the websocket server once the socket has opened
+ws.onopen = function(event) {
+    data = {id: myID};
+    ws.send(JSON.stringify(data));
+}
 
-socket.on('deactivate', function(msg) {
-        console.log(msg);
-        active=false;
-});
+ws.onmessage = function (event) {
+    msg = JSON.parse(event.data);
+    // become activate we receive our own ID
+    if ('id' in msg) {
+      active = (myID == msg['id']);
+    }
+}
 
 // config all the variables based on the window size
 function sizeDependentSetup(w, h) {
@@ -62,8 +81,9 @@ function draw() {
     circleY = dy*d+centerY;
 
     // only send commands when the user is moving the stick
-    socket.emit('cmd', { turn : (circleX-centerX)/maxTravel,
-                      forward : -(circleY-centerY)/maxTravel });
+    data = {turn : (circleX-centerX)/maxTravel,
+            forward : -(circleY-centerY)/maxTravel};
+    ws.send(JSON.stringify(data));
   }
   // drift the circle back towards the center
   else {
@@ -131,14 +151,9 @@ function mousePressed() {
 // handle the mouse up event
 function mouseReleased() {
   grabbed = false;
+  // if the user has clicked and we are not active, send an activate message
   if (!active) {
-    socket.emit('activate', {}, function(data) {active = true;});
+    data = {'activate': true};
+    ws.send(JSON.stringify(data));
   }
 }
-
-// handle mouse clicking to grab control
-// function mouseClicked() {
-//   if (!active) {
-//     socket.emit('activate', {}, function(data) {active = true;});
-//   }
-// }

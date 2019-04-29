@@ -15,11 +15,6 @@ def main():
 def settings():
     return render_template('settings.html')
 
-@app.route('/get_cmd', methods=['GET'])
-def get_cmd():
-	cmd['elapsed'] = time.time() - cmd['time']
-	return json.dumps(cmd)
-
 if __name__ == '__main__':
 	app.run(host='0.0.0.0', debug=True, port=p.flask_port)
 

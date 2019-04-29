@@ -22,9 +22,13 @@ var active = false;
 let returnRate = 0.1;
 
 var ws = new WebSocket("ws://localhost:5050/");
-if (ws.readyState != ws.OPEN) { ws = new WebSocket("ws://beanbagbot.local:5050/"); }
-if (ws.readyState != ws.OPEN) { ws = new WebSocket("ws://10.0.0.1:5050/"); }
-if (ws.readState != ws.OPEN) { ws = new WebSocket("ws://beanbagbot:5050/"); }
+
+function attemptToConnectWebSocket() {
+  if (ws.readyState > 1) { ws = new WebSocket("ws://localhost:5050/"); }
+  if (ws.readyState > 1) { ws = new WebSocket("ws://beanbagbot.local:5050/"); }
+  if (ws.readyState > 1) { ws = new WebSocket("ws://10.0.0.1:5050/"); }
+  if (ws.readyState > 1) { ws = new WebSocket("ws://beanbagbot:5050/"); }
+}
 
 // Send myID to the websocket server once the socket has opened
 ws.onopen = function(event) {
@@ -62,12 +66,19 @@ function windowResized() {
 function setup() {
   createCanvas(window.innerWidth, window.innerHeight);
   sizeDependentSetup(window.innerWidth, window.innerHeight);
+  attemptToConnectWebSocket();
 }
 
 // called at 60hz
 function draw() {
   background(0);
   ellipseMode(CENTER);
+
+  // try to reconnect the websocket if it has closed
+  attemptToConnectWebSocket();
+
+  // deactviate if the websocket is not open
+  active = active && (ws.readyState == ws.OPEN);
 
   // update the circle position
   if (active && grabbed) {
@@ -137,7 +148,12 @@ function drawInactive() {
     noStroke();
     textSize(fontSize);
     textAlign(CENTER, CENTER);
-    text('Tap to take control.', centerX, centerY);
+    if (ws.readyState == ws.OPEN) {
+      text('Tap to take control.', centerX, centerY);
+    }
+    else {
+      text('WebSocket not connected.', centerX, centerY);
+    }
 }
 
 // handle the mouse down event
@@ -153,6 +169,7 @@ function mouseReleased() {
   grabbed = false;
   // if the user has clicked and we are not active, send an activate message
   if (!active) {
+    console.log('blyat');
     data = {'activate': true};
     ws.send(JSON.stringify(data));
   }

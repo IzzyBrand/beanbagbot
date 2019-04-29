@@ -22,15 +22,17 @@ class ControllerServer(WebSocket):
 
             elif 'forward' in parsed_data:
                 print('Received {}\t{}'.format(parsed_data['forward'], parsed_data['turn']))
-                # the motors should be the first client to connect
-                # TODO: make sure this is the case
+                # the motors should be the first client to connect, so we send
+                # the motor commands along
                 if len(clients) > 0:
                     clients[0].sendMessage(msg)
+
+                # TODO: ensure that the motors are the first client to connect
 
             else:
                 pass
 
-        except:
+        except ValueError:
             print('Failed to parse {}'.format(msg))
 
     def handleConnected(self):
@@ -42,7 +44,7 @@ class ControllerServer(WebSocket):
         clients.remove(self)
 
     def broadcast(self, message):
-        for client in clients:
+        for client in clients[1:]:
             print('Broadcasting to: {}'.format(client.id))
             client.sendMessage(message)
 

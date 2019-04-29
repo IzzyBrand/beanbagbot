@@ -22,7 +22,7 @@ batt_warn_voltage = 11.5
 batt_min_voltage = 11.2
 
 # the server stops handling command requests if it hasn't received new control
-server_command_timeout = 1
+motor_command_timeout = 1
 
 # web params
 flask_port = 5000

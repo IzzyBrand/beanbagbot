@@ -5,7 +5,10 @@ import params as p
 clients = []
 
 class ControllerServer(WebSocket):
-    # TODO: figure out how to init with super properly to init self.id field
+
+    def __init__(self, server, sock, address):
+        super(ControllerServer, self).__init__(server, sock, address)
+        self.id = None
 
     def handleMessage(self):
         msg = self.data
@@ -22,10 +25,10 @@ class ControllerServer(WebSocket):
 
             elif 'forward' in parsed_data:
                 print('Received {}\t{}'.format(parsed_data['forward'], parsed_data['turn']))
-                # the motors should be the first client to connect, so we send
-                # the motor commands along
-                if len(clients) > 0:
-                    clients[0].sendMessage(msg)
+
+                for client in clients:
+                    if client.id == 'motors':
+                        client.sendMessage(msg)
 
                 # TODO: ensure that the motors are the first client to connect
 
@@ -44,9 +47,10 @@ class ControllerServer(WebSocket):
         clients.remove(self)
 
     def broadcast(self, message):
-        for client in clients[1:]:
-            print('Broadcasting to: {}'.format(client.id))
-            client.sendMessage(message)
+        for client in clients:
+            if client.id != 'motors':
+                print('Broadcasting to: {}'.format(client.id))
+                client.sendMessage(message)
 
 server = SimpleWebSocketServer('0.0.0.0', p.websocket_port, ControllerServer)
 server.serveforever()

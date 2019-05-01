@@ -22,19 +22,23 @@ var active = false;
 let returnRate = 0.1;
 
 var ws;
+var ws_address_index = 0;
+var ws_addresses = ["ws://beanbagbot.local:5050/",
+                    "ws://localhost:5050/",
+                    "ws://Izzys-MacBook-Pro.local:5050/",
+                    "ws://10.0.0.1:5050/",
+                    "ws://beanbagbot:5050/"]
+
 
 function attemptToConnectWebSocket() {
   // open a new websocket if we haven't opened one at all yet
-  if (ws == undefined) { ws = new WebSocket("ws://beanbagbot.local:5050/"); }
+  if (ws == undefined || ws.readyState > 1) {
+    ws_address_index += 1;
+    ws_address_index %= ws_addresses.length;
+    ws = new WebSocket(ws_addresses[ws_address_index]);
+  }
   // if the current websocket is still open, do nothing
   else if (ws.readyState == ws.OPEN) { return; }
-  // otherwise, try to open a websocket with one of the viable server addrs
-  else {
-    if (ws.readyState > 1) { ws = new WebSocket("ws://beanbagbot.local:5050/"); }
-    if (ws.readyState > 1) { ws = new WebSocket("ws://localhost:5050/"); }
-    if (ws.readyState > 1) { ws = new WebSocket("ws://10.0.0.1:5050/"); }
-    if (ws.readyState > 1) { ws = new WebSocket("ws://beanbagbot:5050/"); }
-  }
 
   // Send myID to the websocket server once the socket has opened
   ws.onopen = function(event) {

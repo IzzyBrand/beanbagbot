@@ -1,8 +1,33 @@
 # beanbagbot
 
-Building a mobile beanbag as a public art piece which aims to make Brown University’s open spaces more interesting and social.
+A mobile motorized beanbag as a public art piece which aims to make Brown University’s open spaces more interesting and social.
 
 ![A rough sketch](pics/first_sketch.jpg)
+
+## Raspberry Pi Setup
+
+See `rpi_wifi_setup` folder for details on setting up the raspberry pi as an access point.
+
+Clone the beanbagbot repo to the home directory.
+
+```
+sudo apt install screen pigpio
+pip3 install SimpleWebSocketServer websockets
+```
+
+Add the following to `/etc/rc.local` right above the `exit 0` line.
+
+```
+su - pi -c "screen -dm -S beanbagbot -c /home/pi/beanbagbot/pi.screenrc"
+```
+
+## What runs
+
+`pi.screenrc` launches the following python scrips
+
+ * `app.py` is a Flask server that hosts the webpage
+ * `wss.py` is a websocket server that communicates with the user
+ * `main.py` is a python script that receives values from `wss.py` and sets the motors accordingly
 
 ## Description
 

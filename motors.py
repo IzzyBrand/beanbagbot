@@ -43,7 +43,7 @@ try:
 
 		def stop(self):
 			for pin in p.motor_pins:
-				self.pi.set_servo_pulsewidth(pin, p.pwm_midpoint)
+				self.pi.set_servo_pulsewidth(pin, p.pwm_mid)
 
 			self.pi.stop()
 

@@ -1,0 +1,26 @@
+escape ``
+
+startup_message off
+
+# this hard status was stolen from the net, all credit goes to its originator
+hardstatus             alwayslastline
+#hardstatus string '%{= mK}%-Lw%{= KW}%50>%n%f* %t%{= mK}%+Lw%< %{= kG}%-=%D %d %M %Y %c:%s%{-}'
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %d/%m %{W}%c %{g}]'
+
+# turn multiuser mode on so others can connect.
+multiuser on
+
+screen -t " open"
+
+screen -t " app.py"
+stuff "cd /home/pi/beanbagbot\n"
+stuff "python3 app.py\n"
+
+screen -t " wss.py"
+stuff "cd /home/pi/beanbagbot\n"
+stuff "python3 wss.py\n"
+
+screen -t " main.py"
+stuff "cd /home/pi/beanbagbot\n"
+stuff "sleep 1\n"
+stuff "python3 main.py\n"

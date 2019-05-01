@@ -25,13 +25,13 @@ var ws;
 
 function attemptToConnectWebSocket() {
   // open a new websocket if we haven't opened one at all yet
-  if (ws == undefined) { ws = new WebSocket("ws://localhost:5050/"); }
+  if (ws == undefined) { ws = new WebSocket("ws://beanbagbot.local:5050/"); }
   // if the current websocket is still open, do nothing
   else if (ws.readyState == ws.OPEN) { return; }
   // otherwise, try to open a websocket with one of the viable server addrs
   else {
-    if (ws.readyState > 1) { ws = new WebSocket("ws://localhost:5050/"); }
     if (ws.readyState > 1) { ws = new WebSocket("ws://beanbagbot.local:5050/"); }
+    if (ws.readyState > 1) { ws = new WebSocket("ws://localhost:5050/"); }
     if (ws.readyState > 1) { ws = new WebSocket("ws://10.0.0.1:5050/"); }
     if (ws.readyState > 1) { ws = new WebSocket("ws://beanbagbot:5050/"); }
   }

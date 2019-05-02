@@ -19,8 +19,8 @@ class ControllerServer(WebSocket):
                 print('Received ID: {}'.format(self.id))
 
             elif 'activate' in parsed_data and self.id is not None:
-                data = json.dumps({'id': self.id})
-                self.broadcast(data)
+                message = json.dumps({'id': self.id})
+                self.broadcast(message)
                 print('{} took control'.format(self.id))
 
             elif 'forward' in parsed_data:
@@ -29,8 +29,6 @@ class ControllerServer(WebSocket):
                 for client in clients:
                     if client.id == 'motors':
                         client.sendMessage(msg)
-
-                # TODO: ensure that the motors are the first client to connect
 
             else:
                 pass
@@ -47,10 +45,7 @@ class ControllerServer(WebSocket):
         clients.remove(self)
 
     def broadcast(self, message):
-        for client in clients:
-            if client.id != 'motors':
-                print('Broadcasting to: {}'.format(client.id))
-                client.sendMessage(message)
+        [c.sendMessage(message) for c in clients if c.id != 'motors']
 
 server = SimpleWebSocketServer('0.0.0.0', p.websocket_port, ControllerServer)
 server.serveforever()

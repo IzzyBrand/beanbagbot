@@ -7,46 +7,55 @@ import json
 
 from motors import Motors
 
-async def run():
+newest_command = (0, 0)
+newest_command_time = 0
+
+async def update_motors():
+    global newest_command, newest_command_time
     m = Motors()
     m.set(0,0)
-    newest_command_time = 0
+    while True:
+        if time.time() - newest_command_time > p.motor_command_timeout:
+            m.set(0,0)
+        else:
+            m.set(*newest_command)
 
-    try:
-        socket_addr = 'ws://localhost:{}'.format(p.websocket_port)
-        async with websockets.connect(socket_addr) as ws:
-            # send our ID to the websocket server
-            id_msg = {"id": "motors"}
-            await ws.send(json.dumps(id_msg))
+        await asyncio.sleep(0.05)
 
-            # receive messages and set the motors accordingly
-            while ws.open:
-                try:
-                    msg = await ws.recv()
-                    parsed_data = json.loads(msg)
-                    if 'forward' in parsed_data:
-                        m.set(parsed_data['forward'], parsed_data['turn'])
-                        newest_command_time = time.time()
+async def receive_messages():
+    global newest_command, newest_command_time
+    socket_addr = 'ws://localhost:{}'.format(p.websocket_port)
+    while True:
+        try:
+            async with websockets.connect(socket_addr) as ws:
 
-                except ValueError:
-                    print('Failed to parse {}'.format(msg))
+                # send our ID to the websocket server
+                id_msg = {"id": "motors"}
+                await ws.send(json.dumps(id_msg))
 
-                # the motors should timeout if we haven't received new commands
-                if time.time() - newest_command_time > p.motor_command_timeout:
-                    m.set(0, 0)
+                # and then receive messages indefinitely
+                async for msg in ws:
+                    try:
+                        parsed_data = json.loads(msg)
+                        if 'forward' in parsed_data and 'turn' in parsed_data:
+                            newest_command = (parsed_data['forward'], parsed_data['turn'])
+                            newest_command_time = time.time()
 
-                asyncio.sleep(0.05)
+                    except ValueError:
+                        print('Failed to parse {}'.format(msg))
 
-            print('Connection to {} closed'.format(socket_addr))
-            m.stop()
+        except OSError:
+            print('Failed to connect to {}'.format(socket_addr))
+            newest_command = (0, 0)
+        except websockets.exceptions.ConnectionClosed:
+            print('Lost connection to {}'.format(socket_addr))
+            newest_command = (0, 0)
 
-    except OSError:
-        print('Failed to connect to {}'.format(socket_addr))
-        m.stop()
-    except websockets.exceptions.ConnectionClosed:
-        print('Lost connection to {}'.format(socket_addr))
-        m.stop()
+        await asyncio.sleep(0.5)
 
 
 if __name__ == '__main__':
-    asyncio.get_event_loop().run_until_complete(run())
+    loop = asyncio.get_event_loop()
+    loop.create_task(update_motors())
+    loop.create_task(receive_messages())
+    loop.run_forever()

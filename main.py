@@ -7,23 +7,24 @@ import json
 
 from motors import Motors
 
-newest_command = (0, 0)
-newest_command_time = 0
+cmd = {'forward': 0,
+       'turn': 0,
+       'time': 0}
 
 async def update_motors():
-    global newest_command, newest_command_time
+    global cmd
     m = Motors()
     m.set(0,0)
     while True:
-        if time.time() - newest_command_time > p.motor_command_timeout:
+        if time.time() - cmd['time'] > p.motor_command_timeout:
             m.set(0,0)
         else:
-            m.set(*newest_command)
+            m.set(cmd['forward'], cmd['turn'])
 
         await asyncio.sleep(0.05)
 
 async def receive_messages():
-    global newest_command, newest_command_time
+    global cmd
     socket_addr = 'ws://localhost:{}'.format(p.websocket_port)
     while True:
         try:
@@ -38,18 +39,18 @@ async def receive_messages():
                     try:
                         parsed_data = json.loads(msg)
                         if 'forward' in parsed_data and 'turn' in parsed_data:
-                            newest_command = (parsed_data['forward'], parsed_data['turn'])
-                            newest_command_time = time.time()
+                            cmd.update(parsed_data)
+                            cmd['time'] = time.time()
 
                     except ValueError:
                         print('Failed to parse {}'.format(msg))
 
         except OSError:
             print('Failed to connect to {}'.format(socket_addr))
-            newest_command = (0, 0)
+            cmd = (0, 0)
         except websockets.exceptions.ConnectionClosed:
             print('Lost connection to {}'.format(socket_addr))
-            newest_command = (0, 0)
+            cmd = (0, 0)
 
         await asyncio.sleep(0.5)
 
